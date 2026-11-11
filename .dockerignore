@@ -1,0 +1,7 @@
+.git
+**/.git
+build/
+install/
+log/
+apps/
+firmware/

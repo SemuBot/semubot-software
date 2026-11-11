@@ -28,6 +28,7 @@ Not included: `semubot-deployment` (empty), `Operating-instructions` (docs), `au
 
 ```bash
 git clone --recurse-submodules https://github.com/SemuBot/semubot-software.git
+docker build -t semubot-software .
 rosdep install --from-paths src --ignore-src -r -y && colcon build --symlink-install
-git submodule update --remote src/<pkg> && git add src/<pkg> && git commit   # move one pin
+git submodule update --remote src/<pkg> && git add src/<pkg> && git commit
 ```
