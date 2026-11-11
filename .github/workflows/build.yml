@@ -27,3 +27,11 @@ jobs:
           tags: semubot-software:test
           load: true
           cache-from: type=gha
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: firmware
+          tags: semubot-software:firmware
+          load: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
