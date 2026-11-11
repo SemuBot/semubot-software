@@ -48,3 +48,6 @@
 	branch = main
 [submodule "firmware/wheelbase"]
 	shallow = true
+	path = firmware/wheelbase
+	url = https://github.com/SemuBot/semubot-firmware.git
+	branch = fw/ros2ctrl-microros
