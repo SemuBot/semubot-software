@@ -46,3 +46,5 @@
 	path = apps/semubot_chest_display
 	url = https://github.com/SemuBot/semubot_chest_display.git
 	branch = main
+[submodule "firmware/wheelbase"]
+	shallow = true

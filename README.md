@@ -15,14 +15,16 @@ semubot-software/
 │   ├── semubot_brain               speech: VAD, ASR, LLM (local or cloud), Estonian TTS                  [NUC]
 │   ├── semubot_eyes                animated face driven by mic direction and brain state                 [NUC]
 │   └── respeaker_ros               ReSpeaker 4-mic array: audio + direction of arrival                   [NUC]
-└── apps/                           non-ROS apps
-    ├── semubot_webapp              touchscreen web control via rosbridge (FastAPI, Docker)               [NUC]
-    └── semubot_chest_display       chest touch screen: menus, speech settings, battery (Tkinter+rclpy)   [NUC]
+├── apps/                           non-ROS apps
+│   ├── semubot_webapp              touchscreen web control via rosbridge (FastAPI, Docker)               [NUC]
+│   └── semubot_chest_display       chest touch screen: menus, speech settings, battery (Tkinter+rclpy)   [NUC]
+└── firmware/                       microcontroller firmware
+    └── wheelbase                   STM32F303 wheelbase: FreeRTOS, micro-ROS, DRV8353 (branch fw/ros2ctrl-microros) [STM32 board]
 ```
 
-Branches tracked: `jazzy` for description, arm_description, gazebo, ros_control; `main`/`master` for the rest.
+Branches tracked: `jazzy` for description, arm_description, gazebo, ros_control; `fw/ros2ctrl-microros` for the firmware (the active stack; the other variants `fw/ros2ctrl-serial`, `fw/onboard-pid-microros`, `fw/onboard-pid-serial` stay as branches of semubot-firmware); `main`/`master` for the rest. The firmware submodule is shallow (`shallow = true`) because its history is large.
 
-Not included: `semubot-firmware` (added under `firmware/` once its `main` is current), `semubot-deployment` (empty), `Operating-instructions` (docs), `audio_test` (superseded), `semubot-inventory` (not robot software), `semubot_backup` (archive), `*-thesis-*` (archived submissions).
+Not included: `semubot-deployment` (empty), `Operating-instructions` (docs), `audio_test` (superseded), `semubot-inventory` (not robot software), `semubot_backup` (archive), `*-thesis-*` (archived submissions).
 
 ```bash
 git clone --recurse-submodules https://github.com/SemuBot/semubot-software.git
