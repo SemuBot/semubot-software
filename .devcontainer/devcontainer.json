@@ -1,0 +1,7 @@
+{
+  "name": "semubot-software",
+  "build": { "dockerfile": "../Dockerfile", "context": "..", "target": "deps" },
+  "workspaceFolder": "/ws/ros2_ws",
+  "workspaceMount": "source=${localWorkspaceFolder},target=/ws,type=bind",
+  "postCreateCommand": "rosdep install --from-paths src --ignore-src -r -y"
+}

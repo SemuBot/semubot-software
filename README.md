@@ -4,31 +4,55 @@ All SemuBot software components as git submodules, pinned to known commits. Soft
 
 ```
 semubot-software/
-├── src/                            ROS 2 packages (Jazzy)
-│   ├── semubot_bringup             launch files: ros2_control + micro-ROS wheelbase stack, joystick     [STM32 robot host]
-│   ├── semubot_ros_control         ros2_control hardware interface + velocity controller, 3-wheel omni  [STM32 robot host]
-│   ├── semubot_driver              serial driver for the STM32 wheelbase firmware                       [STM32 robot host]
-│   ├── semubot_raspberry_bringup   GPIO motor driver, e-stop, joystick, battery monitor, systemd         [Raspberry Pi 5 robot]
+├── ros2_ws/src/                    ROS 2 packages (Jazzy); build from ros2_ws
+│   ├── semubot_bringup             launch files: ros2_control + micro-ROS wheelbase stack, joystick     [V2: Raspberry Pi 5]
+│   ├── semubot_ros_control         ros2_control hardware interface + velocity controller, 3-wheel omni  [V2: Raspberry Pi 5]
+│   ├── semubot_driver              serial driver for the STM32 wheelbase firmware                       [V2: Raspberry Pi 5]
+│   ├── semubot_raspberry_bringup   GPIO motor driver, e-stop, joystick, battery monitor, systemd         [V1: Raspberry Pi 5, legacy]
 │   ├── semubot_description         URDF/xacro model (V1 + V2 wheelbase), meshes                          [any]
 │   ├── semubot_arm_description     arm + hand xacro macro, included by semubot_description               [any]
 │   ├── semubot_gazebo              Gazebo worlds and launch                                              [dev PC]
 │   ├── semubot_brain               speech: VAD, ASR, LLM (local or cloud), Estonian TTS                  [NUC]
-│   ├── semubot_eyes                animated face driven by mic direction and brain state                 [NUC]
+│   ├── semubot_eyes                animated face driven by the brain's state                            [NUC]
 │   └── respeaker_ros               ReSpeaker 4-mic array: audio + direction of arrival                   [NUC]
 ├── apps/                           non-ROS apps
 │   ├── semubot_webapp              touchscreen web control via rosbridge (FastAPI, Docker)               [NUC]
 │   └── semubot_chest_display       chest touch screen: menus, speech settings, battery (Tkinter+rclpy)   [NUC]
-└── firmware/                       microcontroller firmware
-    └── wheelbase                   STM32F303 wheelbase: FreeRTOS, micro-ROS, DRV8353 (branch fw/ros2ctrl-microros) [STM32 board]
+├── firmware/                       microcontroller firmware
+│   └── wheelbase                   STM32F303 wheelbase: FreeRTOS, micro-ROS, DRV8353 (branch fw/ros2ctrl-microros) [STM32 board]
+└── docs/
+    └── operating-instructions      how to start, connect to and operate the robots: machines, IPs, services
 ```
 
-Branches tracked: `jazzy` for description, arm_description, gazebo, ros_control; `fw/ros2ctrl-microros` for the firmware (the active stack; the other variants `fw/ros2ctrl-serial`, `fw/onboard-pid-microros`, `fw/onboard-pid-serial` stay as branches of semubot-firmware); `main`/`master` for the rest. The firmware submodule is shallow (`shallow = true`) because its history is large.
+V2 is the robot this workspace targets: Raspberry Pi 5 runs the ROS nodes, the STM32 board drives the motors, the NUC runs speech. V1 (old wheelbase driven from the Pi's GPIO) stays pinned but is not developed further.
 
-Not included: `semubot-deployment` (empty), `Operating-instructions` (docs), `audio_test` (superseded), `semubot-inventory` (not robot software), `semubot_backup` (archive), `*-thesis-*` (archived submissions).
+Start here:
 
 ```bash
 git clone --recurse-submodules https://github.com/SemuBot/semubot-software.git
-docker build -t semubot-software .
-rosdep install --from-paths src --ignore-src -r -y && colcon build --symlink-install
-git submodule update --remote src/<pkg> && git add src/<pkg> && git commit
+cd semubot-software
+```
+
+With Docker (also what CI runs; the `firmware` target builds the STM32 image with the Makefile from `semubot-firmware`):
+
+```bash
+docker build --target build -t semubot-software .
+docker build --target firmware -t semubot-software:firmware .
+```
+
+Natively on Ubuntu 24.04 with ROS 2 Jazzy:
+
+```bash
+cd ros2_ws
+source /opt/ros/jazzy/setup.bash
+rosdep install --from-paths src --ignore-src -r -y
+colcon build --symlink-install
+```
+
+VS Code with the Dev Containers extension opens the same image through `.devcontainer/`.
+
+Move a pin after a component repo changed:
+
+```bash
+git submodule update --remote ros2_ws/src/<pkg> && git add ros2_ws/src/<pkg> && git commit
 ```

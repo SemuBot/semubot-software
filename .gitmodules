@@ -1,41 +1,41 @@
 [submodule "src/semubot_bringup"]
-	path = src/semubot_bringup
+	path = ros2_ws/src/semubot_bringup
 	url = https://github.com/SemuBot/semubot_bringup.git
 	branch = main
 [submodule "src/semubot_brain"]
-	path = src/semubot_brain
+	path = ros2_ws/src/semubot_brain
 	url = https://github.com/SemuBot/semubot_brain.git
 	branch = main
 [submodule "src/semubot_description"]
-	path = src/semubot_description
+	path = ros2_ws/src/semubot_description
 	url = https://github.com/SemuBot/semubot_description.git
 	branch = jazzy
 [submodule "src/semubot_arm_description"]
-	path = src/semubot_arm_description
+	path = ros2_ws/src/semubot_arm_description
 	url = https://github.com/SemuBot/semubot_arm_description.git
 	branch = jazzy
 [submodule "src/semubot_driver"]
-	path = src/semubot_driver
+	path = ros2_ws/src/semubot_driver
 	url = https://github.com/SemuBot/semubot_driver.git
 	branch = main
 [submodule "src/semubot_eyes"]
-	path = src/semubot_eyes
+	path = ros2_ws/src/semubot_eyes
 	url = https://github.com/SemuBot/semubot_eyes.git
 	branch = main
 [submodule "src/semubot_gazebo"]
-	path = src/semubot_gazebo
+	path = ros2_ws/src/semubot_gazebo
 	url = https://github.com/SemuBot/semubot_gazebo.git
 	branch = jazzy
 [submodule "src/semubot_raspberry_bringup"]
-	path = src/semubot_raspberry_bringup
+	path = ros2_ws/src/semubot_raspberry_bringup
 	url = https://github.com/SemuBot/semubot_raspberry_bringup.git
 	branch = main
 [submodule "src/semubot_ros_control"]
-	path = src/semubot_ros_control
+	path = ros2_ws/src/semubot_ros_control
 	url = https://github.com/SemuBot/semubot_ros_control.git
 	branch = jazzy
 [submodule "src/respeaker_ros"]
-	path = src/respeaker_ros
+	path = ros2_ws/src/respeaker_ros
 	url = https://github.com/SemuBot/respeaker_ros.git
 	branch = master
 [submodule "apps/semubot_webapp"]
@@ -51,3 +51,7 @@
 	path = firmware/wheelbase
 	url = https://github.com/SemuBot/semubot-firmware.git
 	branch = fw/ros2ctrl-microros
+[submodule "docs/operating-instructions"]
+	path = docs/operating-instructions
+	url = https://github.com/SemuBot/Operating-instructions.git
+	branch = main
