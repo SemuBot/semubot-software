@@ -1,0 +1,37 @@
+name: ros-package
+on:
+  workflow_call:
+    inputs:
+      package:
+        required: true
+        type: string
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    container: ros:jazzy-ros-base
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: SemuBot/semubot-software
+          submodules: recursive
+          path: semubot-software
+      - run: rm -rf semubot-software/ros2_ws/src/${{ inputs.package }}
+      - uses: actions/checkout@v4
+        with:
+          path: semubot-software/ros2_ws/src/${{ inputs.package }}
+      - run: |
+          cd semubot-software/ros2_ws
+          apt-get update
+          rosdep update --rosdistro jazzy
+          rosdep install --from-paths src --ignore-src -r -y --rosdistro jazzy
+      - run: |
+          cd semubot-software/ros2_ws
+          . /opt/ros/jazzy/setup.sh
+          colcon build --packages-up-to ${{ inputs.package }}
+      - run: |
+          cd semubot-software/ros2_ws
+          . /opt/ros/jazzy/setup.sh
+          . install/setup.sh
+          colcon test --packages-select ${{ inputs.package }}
+          colcon test-result --verbose
+        continue-on-error: true
