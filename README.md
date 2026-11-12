@@ -5,15 +5,15 @@ All SemuBot software components as git submodules, pinned to known commits. Soft
 ```
 semubot-software/
 ├── ros2_ws/src/                    ROS 2 packages (Jazzy); build from ros2_ws
-│   ├── semubot_bringup             launch files: ros2_control + micro-ROS wheelbase stack, joystick     [V2: Raspberry Pi 5]
-│   ├── semubot_ros_control         ros2_control hardware interface + velocity controller, 3-wheel omni  [V2: Raspberry Pi 5]
-│   ├── semubot_driver              serial driver for the STM32 wheelbase firmware                       [V2: Raspberry Pi 5]
+│   ├── semubot_bringup             launch files: ros2_control + micro-ROS wheelbase stack, joystick      [V2: Raspberry Pi 5]
+│   ├── semubot_ros_control         ros2_control hardware interface + velocity controller, 3-wheel omni   [V2: Raspberry Pi 5]
+│   ├── semubot_driver              serial driver for the STM32 wheelbase firmware                        [V2: Raspberry Pi 5]
 │   ├── semubot_raspberry_bringup   GPIO motor driver, e-stop, joystick, battery monitor, systemd         [V1: Raspberry Pi 5, legacy]
 │   ├── semubot_description         URDF/xacro model (V1 + V2 wheelbase), meshes                          [any]
 │   ├── semubot_arm_description     arm + hand xacro macro, included by semubot_description               [any]
 │   ├── semubot_gazebo              Gazebo worlds and launch                                              [dev PC]
 │   ├── semubot_brain               speech: VAD, ASR, LLM (local or cloud), Estonian TTS                  [NUC]
-│   ├── semubot_eyes                animated face driven by the brain's state                            [NUC]
+│   ├── semubot_eyes                animated face driven by the brain's state                             [NUC]
 │   └── respeaker_ros               ReSpeaker 4-mic array: audio + direction of arrival                   [NUC]
 ├── apps/                           non-ROS apps
 │   ├── semubot_webapp              touchscreen web control via rosbridge (FastAPI, Docker)               [NUC]
