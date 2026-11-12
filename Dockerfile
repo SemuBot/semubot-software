@@ -15,9 +15,6 @@ FROM deps AS build
 RUN source /opt/ros/jazzy/setup.bash && colcon build --symlink-install
 
 FROM build AS test
-RUN apt-get update && apt-get install -y --no-install-recommends \
-        python3-requests python3-pygame python3-scipy python3-lgpio \
-    && rm -rf /var/lib/apt/lists/*
 RUN source /opt/ros/jazzy/setup.bash && source /ws/install/setup.bash \
     && colcon test; colcon test-result --verbose; true
 
