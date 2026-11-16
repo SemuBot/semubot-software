@@ -15,23 +15,17 @@ jobs:
         with:
           context: .
           target: build
-          tags: semubot-software:ci
-          load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=build
+          cache-to: type=gha,scope=build,mode=max
       - uses: docker/build-push-action@v6
         continue-on-error: true
         with:
           context: .
           target: test
-          tags: semubot-software:test
-          load: true
-          cache-from: type=gha
+          cache-from: type=gha,scope=build
       - uses: docker/build-push-action@v6
         with:
           context: .
           target: firmware
-          tags: semubot-software:firmware
-          load: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=firmware
+          cache-to: type=gha,scope=firmware,mode=max
