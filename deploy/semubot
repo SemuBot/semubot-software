@@ -1,0 +1,55 @@
+#!/bin/bash
+# Install, update and roll back the SemuBot software on a robot computer.
+#   deploy/semubot install          build this checkout, install the units, start them
+#   deploy/semubot update [REF]     switch the checkout to REF (default: origin/main) and install
+#   deploy/semubot rollback         switch back to the commit the last update replaced
+#   deploy/semubot status | logs
+set -eo pipefail
+REPO="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
+CONF="$HOME/.config/semubot"
+UNITS="semubot-drive.service"
+
+install() {
+    source /opt/ros/jazzy/setup.bash
+    sudo apt-get install -y --no-install-recommends ros-jazzy-rmw-cyclonedds-cpp python3-rosdep python3-colcon-common-extensions
+    [ -d /etc/ros/rosdep/sources.list.d ] || sudo rosdep init
+    rosdep update --rosdistro jazzy
+    (cd "$REPO/ros2_ws" && rosdep install --from-paths src --ignore-src -r -y --rosdistro jazzy && colcon build --symlink-install)
+
+    mkdir -p "$CONF" "$HOME/.config/systemd/user"
+    [ -f "$CONF/semubot.env" ] || cp "$REPO/deploy/semubot.env.example" "$CONF/semubot.env"
+    if ! cmp -s "$REPO/deploy/99-semubot-wheelbase.rules" /etc/udev/rules.d/99-semubot-wheelbase.rules; then
+        sudo cp "$REPO/deploy/99-semubot-wheelbase.rules" /etc/udev/rules.d/ && sudo udevadm control --reload && sudo udevadm trigger
+    fi
+    for u in $UNITS; do sed "s#REPO#$REPO#" "$REPO/deploy/$u" > "$HOME/.config/systemd/user/$u"; done
+    sudo loginctl enable-linger "$USER"
+    systemctl --user daemon-reload
+    systemctl --user enable --now $UNITS
+    systemctl --user restart $UNITS
+    git -C "$REPO" rev-parse HEAD > "$CONF/installed"
+    echo "Installed $(git -C "$REPO" describe --always --tags). Logs: journalctl --user -u semubot-drive -f"
+}
+
+update() {
+    local ref="${1:-origin/main}"
+    git -C "$REPO" fetch --tags origin
+    git -C "$REPO" rev-parse HEAD > "$CONF/previous"
+    git -C "$REPO" checkout --detach "$ref"
+    git -C "$REPO" submodule sync --recursive
+    git -C "$REPO" submodule update --init --recursive
+    install
+}
+
+rollback() {
+    [ -f "$CONF/previous" ] || { echo "Nothing to roll back to."; exit 1; }
+    update "$(cat "$CONF/previous")"
+}
+
+case "${1:-}" in
+    install) install ;;
+    update) update "${2:-}" ;;
+    rollback) rollback ;;
+    status) systemctl --user status $UNITS --no-pager ;;
+    logs) journalctl --user -u semubot-drive -f ;;
+    *) sed -n '2,6p' "$0"; exit 1 ;;
+esac

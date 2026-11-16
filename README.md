@@ -14,12 +14,15 @@ semubot-software/
 │   ├── semubot_gazebo              Gazebo worlds and launch                                              [dev PC]
 │   ├── semubot_brain               speech: VAD, ASR, LLM (local or cloud), Estonian TTS                  [NUC]
 │   ├── semubot_eyes                animated face driven by the brain's state                             [NUC]
-│   └── respeaker_ros               ReSpeaker 4-mic array: audio + direction of arrival                   [NUC]
+│   ├── respeaker_ros               ReSpeaker 4-mic array: audio + direction of arrival                   [NUC]
+│   ├── micro_ros_agent             micro-ROS agent (eProsima), bridges the STM32 board to ROS 2          [V2: Raspberry Pi 5]
+│   └── micro_ros_msgs              messages the agent needs                                               [V2: Raspberry Pi 5]
 ├── apps/                           non-ROS apps
 │   ├── semubot_webapp              touchscreen web control via rosbridge (FastAPI, Docker)               [NUC]
 │   └── semubot_chest_display       chest touch screen: menus, speech settings, battery (Tkinter+rclpy)   [NUC]
 ├── firmware/                       microcontroller firmware
 │   └── wheelbase                   STM32F303 wheelbase: FreeRTOS, micro-ROS, DRV8353 (branch fw/ros2ctrl-microros) [STM32 board]
+├── deploy/                         install, update and roll back on a robot computer: units, udev rule, env
 └── docs/
     └── operating-instructions      how to start, connect to and operate the robots: machines, IPs, services
 ```
@@ -50,6 +53,16 @@ colcon build --symlink-install
 ```
 
 VS Code with the Dev Containers extension opens the same image through `.devcontainer/`.
+
+On a robot computer (Ubuntu 24.04, ROS 2 Jazzy, user `semubot`), after the clone:
+
+```bash
+deploy/semubot install            # build, user units, udev rule, start at boot
+deploy/semubot update [REF]       # switch to a commit or tag (default origin/main) and reinstall
+deploy/semubot rollback           # back to the commit the last update replaced
+```
+
+Settings live in `~/.config/semubot/semubot.env`; logs: `journalctl --user -u semubot-drive -f`.
 
 Move a pin after a component repo changed:
 

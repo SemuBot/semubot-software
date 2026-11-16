@@ -55,3 +55,11 @@
 	path = docs/operating-instructions
 	url = https://github.com/SemuBot/Operating-instructions.git
 	branch = main
+[submodule "ros2_ws/src/micro_ros_agent"]
+	path = ros2_ws/src/micro_ros_agent
+	url = https://github.com/micro-ROS/micro-ROS-Agent.git
+	branch = jazzy
+[submodule "ros2_ws/src/micro_ros_msgs"]
+	path = ros2_ws/src/micro_ros_msgs
+	url = https://github.com/micro-ROS/micro_ros_msgs.git
+	branch = jazzy

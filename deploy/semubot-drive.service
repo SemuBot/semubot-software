@@ -1,0 +1,11 @@
+[Unit]
+Description=SemuBot drive stack: micro-ROS agent, ros2_control, joystick
+
+[Service]
+# deploy/semubot replaces REPO with the checkout path
+ExecStart=REPO/deploy/start-drive.sh
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

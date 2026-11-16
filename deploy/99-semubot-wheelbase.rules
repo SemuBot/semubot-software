@@ -1,0 +1,1 @@
+SUBSYSTEM=="tty", ATTRS{idVendor}=="0483", ATTRS{idProduct}=="5740", ATTRS{product}=="semubot_wheelbase", SYMLINK+="semubot_wheelbase", MODE="0666"
