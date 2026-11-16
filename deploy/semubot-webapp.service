@@ -1,0 +1,13 @@
+[Unit]
+Description=SemuBot webapp container
+After=docker.service semubot-rosbridge.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+# deploy/semubot replaces REPO with the checkout path
+ExecStart=REPO/deploy/run.sh docker compose --project-directory REPO/apps/semubot_webapp up -d
+ExecStop=REPO/deploy/run.sh docker compose --project-directory REPO/apps/semubot_webapp down
+
+[Install]
+WantedBy=default.target

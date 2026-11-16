@@ -1,33 +1,55 @@
 #!/bin/bash
 # Install, update and roll back the SemuBot software on a robot computer.
-#   deploy/semubot install          build this checkout, install the units, start them
+#   deploy/semubot install          build this checkout, install the units for this machine, start them
 #   deploy/semubot update [REF]     switch the checkout to REF (default: origin/main) and install
 #   deploy/semubot rollback         switch back to the commit the last update replaced
-#   deploy/semubot status | logs
+#   deploy/semubot status | logs [UNIT]
+# The machine is SEMUBOT_MACHINE=pi|nuc in ~/.config/semubot/semubot.env.
 set -eo pipefail
 REPO="$(cd "$(dirname "$(readlink -f "$0")")/.." && pwd)"
 CONF="$HOME/.config/semubot"
-UNITS="semubot-drive.service"
+ENV_FILE="$CONF/semubot.env"
+
+machine() {
+    if [ ! -f "$ENV_FILE" ]; then
+        mkdir -p "$CONF" && cp "$REPO/deploy/semubot.env.example" "$ENV_FILE"
+        echo "Created $ENV_FILE: set SEMUBOT_MACHINE=pi or nuc there and run again."; exit 1
+    fi
+    set -a; source "$ENV_FILE"; set +a
+    case "${SEMUBOT_MACHINE:-}" in
+        pi) UNITS="semubot-drive" ;;
+        nuc) UNITS="semubot-rosbridge semubot-brain semubot-respeaker semubot-eyes semubot-webapp" ;;
+        *) echo "Set SEMUBOT_MACHINE=pi or nuc in $ENV_FILE."; exit 1 ;;
+    esac
+}
 
 install() {
+    machine
     source /opt/ros/jazzy/setup.bash
     sudo apt-get install -y --no-install-recommends ros-jazzy-rmw-cyclonedds-cpp python3-rosdep python3-colcon-common-extensions
     [ -d /etc/ros/rosdep/sources.list.d ] || sudo rosdep init
     rosdep update --rosdistro jazzy
     (cd "$REPO/ros2_ws" && rosdep install --from-paths src --ignore-src -r -y --rosdistro jazzy && colcon build --symlink-install)
 
-    mkdir -p "$CONF" "$HOME/.config/systemd/user"
-    [ -f "$CONF/semubot.env" ] || cp "$REPO/deploy/semubot.env.example" "$CONF/semubot.env"
-    if ! cmp -s "$REPO/deploy/99-semubot-wheelbase.rules" /etc/udev/rules.d/99-semubot-wheelbase.rules; then
+    if [ "$SEMUBOT_MACHINE" = pi ] && ! cmp -s "$REPO/deploy/99-semubot-wheelbase.rules" /etc/udev/rules.d/99-semubot-wheelbase.rules; then
         sudo cp "$REPO/deploy/99-semubot-wheelbase.rules" /etc/udev/rules.d/ && sudo udevadm control --reload && sudo udevadm trigger
     fi
-    for u in $UNITS; do sed "s#REPO#$REPO#" "$REPO/deploy/$u" > "$HOME/.config/systemd/user/$u"; done
+    if [ "$SEMUBOT_MACHINE" = nuc ]; then
+        sudo apt-get install -y --no-install-recommends ros-jazzy-rosbridge-server sox python3-pip python3-tk python3-pil.imagetk python3-qrcode
+        pip install --user --break-system-packages -q pygame anthropic onnxruntime "brotli>=1.2.0"
+        command -v docker > /dev/null || { echo "Install Docker first: https://docs.docker.com/engine/install/"; exit 1; }
+        docker compose --project-directory "$REPO/apps/semubot_webapp" build
+        "$REPO/apps/semubot_chest_display/deploy/install.sh"
+    fi
+
+    mkdir -p "$HOME/.config/systemd/user"
+    for u in $UNITS; do sed "s#REPO#$REPO#g" "$REPO/deploy/$u.service" > "$HOME/.config/systemd/user/$u.service"; done
     sudo loginctl enable-linger "$USER"
     systemctl --user daemon-reload
-    systemctl --user enable --now $UNITS
+    systemctl --user enable $UNITS
     systemctl --user restart $UNITS
     git -C "$REPO" rev-parse HEAD > "$CONF/installed"
-    echo "Installed $(git -C "$REPO" describe --always --tags). Logs: journalctl --user -u semubot-drive -f"
+    echo "Installed $(git -C "$REPO" describe --always --tags) on the $SEMUBOT_MACHINE. Logs: deploy/semubot logs"
 }
 
 update() {
@@ -49,7 +71,7 @@ case "${1:-}" in
     install) install ;;
     update) update "${2:-}" ;;
     rollback) rollback ;;
-    status) systemctl --user status $UNITS --no-pager ;;
-    logs) journalctl --user -u semubot-drive -f ;;
-    *) sed -n '2,6p' "$0"; exit 1 ;;
+    status) machine; systemctl --user status $UNITS --no-pager ;;
+    logs) machine; [ -n "${2:-}" ] && UNITS="$2"; journalctl --user -f $(for u in $UNITS; do printf -- '-u %s ' "$u"; done) ;;
+    *) sed -n '2,7p' "$0"; exit 1 ;;
 esac

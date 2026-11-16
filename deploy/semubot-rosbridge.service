@@ -1,0 +1,11 @@
+[Unit]
+Description=SemuBot rosbridge for the webapp
+
+[Service]
+# deploy/semubot replaces REPO with the checkout path
+ExecStart=REPO/deploy/run.sh ros2 launch rosbridge_server rosbridge_websocket_launch.xml
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

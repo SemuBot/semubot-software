@@ -1,0 +1,11 @@
+[Unit]
+Description=SemuBot brain: speech in, LLM, speech out
+
+[Service]
+# deploy/semubot replaces REPO with the checkout path
+ExecStart=REPO/deploy/run.sh ros2 run semubot_brain llm_controller
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=default.target

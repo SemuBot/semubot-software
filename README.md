@@ -54,7 +54,7 @@ colcon build --symlink-install
 
 VS Code with the Dev Containers extension opens the same image through `.devcontainer/`.
 
-On a robot computer (Ubuntu 24.04, ROS 2 Jazzy, user `semubot`), after the clone:
+On a robot computer (Ubuntu 24.04, ROS 2 Jazzy, user `semubot`), after the clone. The first run creates `~/.config/semubot/semubot.env`; set `SEMUBOT_MACHINE` there to `pi` (drive stack) or `nuc` (speech, face, webapp, chest display) and run again:
 
 ```bash
 deploy/semubot install            # build, user units, udev rule, start at boot
@@ -62,7 +62,7 @@ deploy/semubot update [REF]       # switch to a commit or tag (default origin/ma
 deploy/semubot rollback           # back to the commit the last update replaced
 ```
 
-Settings live in `~/.config/semubot/semubot.env`; logs: `journalctl --user -u semubot-drive -f`.
+Units are `semubot-drive` on the Pi; `semubot-rosbridge`, `semubot-brain`, `semubot-respeaker`, `semubot-eyes`, `semubot-webapp` and the chest display's own unit on the NUC. The speech backends (whisper, llama, TTS) are not part of this workspace yet.
 
 Move a pin after a component repo changed:
 
