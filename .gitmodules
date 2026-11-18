@@ -63,3 +63,7 @@
 	path = ros2_ws/src/micro_ros_msgs
 	url = https://github.com/micro-ROS/micro_ros_msgs.git
 	branch = jazzy
+[submodule "ros2_ws/src/semubot_config"]
+	path = ros2_ws/src/semubot_config
+	url = https://github.com/SemuBot/semubot_config.git
+	branch = main

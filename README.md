@@ -11,6 +11,7 @@ semubot-software/
 │   ├── semubot_raspberry_bringup   GPIO motor driver, e-stop, joystick, battery monitor, systemd         [V1: Raspberry Pi 5, legacy]
 │   ├── semubot_description         URDF/xacro model (V1 + V2 wheelbase), meshes                          [any]
 │   ├── semubot_arm_description     arm + hand xacro macro, included by semubot_description               [any]
+│   ├── semubot_config              parameter profiles, one per robot revision (v1, v2)                   [any]
 │   ├── semubot_gazebo              Gazebo worlds and launch                                              [dev PC]
 │   ├── semubot_brain               speech: VAD, ASR, LLM (local or cloud), Estonian TTS                  [NUC]
 │   ├── semubot_eyes                animated face driven by the brain's state                             [NUC]
@@ -61,7 +62,7 @@ colcon test-result --verbose
 
 VS Code with the Dev Containers extension opens the same image through `.devcontainer/`.
 
-On a robot computer (Ubuntu 24.04, ROS 2 Jazzy, user `semubot`), after the clone. The first run creates `~/.config/semubot/semubot.env`; set `SEMUBOT_MACHINE` there to `pi` (drive stack) or `nuc` (speech, face, webapp, chest display) and run again:
+On a robot computer (Ubuntu 24.04, ROS 2 Jazzy, user `semubot`), after the clone. The first run creates `~/.config/semubot/semubot.env`; set `SEMUBOT_MACHINE` there to `pi` (drive stack) or `nuc` (speech, face, webapp, chest display), `SEMUBOT_PROFILE` to the robot revision, and run again:
 
 ```bash
 deploy/semubot install            # build, user units, udev rule, start at boot
@@ -69,7 +70,7 @@ deploy/semubot update [REF]       # switch to a commit or tag (default origin/ma
 deploy/semubot rollback           # back to the commit the last update replaced
 ```
 
-Units are `semubot-drive` on the Pi; `semubot-rosbridge`, `semubot-brain`, `semubot-respeaker`, `semubot-eyes`, `semubot-webapp` and the chest display's own unit on the NUC. The speech backends (whisper, llama, TTS) are not part of this workspace yet.
+Units are `semubot-drive` on the Pi; `semubot-rosbridge`, `semubot-brain`, `semubot-respeaker`, `semubot-eyes`, `semubot-webapp` and `semubot-chest-display` on the NUC. Every unit runs through `deploy/run.sh`, which loads the env file and points the apps at the profile from `semubot_config`. The speech backends (whisper, llama, TTS) are not part of this workspace yet.
 
 Move a pin after a component repo changed:
 
@@ -82,7 +83,7 @@ ROS 2 topics between the components (domain 5, CycloneDDS):
 | Topic | Type | Content | From | To |
 |---|---|---|---|---|
 | `/joy` | `sensor_msgs/Joy` | gamepad axes and buttons | `joy` | `teleop_twist_joy` |
-| `/cmd_vel` | `geometry_msgs/Twist` | V2: m/s and rad/s, clamped to 0.4; V1: unitless −1..1 | `teleop_twist_joy`, `semubot_webapp` | `semubot_ros_control` velocity controller (V2), `semubot_raspberry_bringup` (V1) |
+| `/cmd_vel` | `geometry_msgs/Twist` | V2: m/s and rad/s, limits from the profile (0.4); V1: unitless −1..1 | `teleop_twist_joy`, `semubot_webapp` | `semubot_ros_control` velocity controller (V2), `semubot_raspberry_bringup` (V1) |
 | `/hardware_interface/velocity_cmd` | `std_msgs/Float32MultiArray` | PWM duty per motor `[M1, M2, M3]`, clamped to 0.30 by the controller and 0.50 by the firmware | `semubot_ros_control` hardware interface | `firmware/wheelbase` (motors stop after 1 s without a message) |
 | `/motor_states` | `sensor_msgs/JointState` | joints `omni_ball_{1,2,3}_joint`: position rad, velocity rad/s, effort = driver fault bits | `firmware/wheelbase` | `semubot_ros_control` hardware interface and fault diagnostics |
 | `/joint_states` | `sensor_msgs/JointState` | wheel joints | `joint_state_broadcaster` | `robot_state_publisher` |
@@ -118,6 +119,6 @@ Interfaces outside ROS:
 | micro-ROS serial | Raspberry Pi 5 ↔ STM32 wheelbase | USB CDC, `/dev/semubot_wheelbase`, `micro_ros_agent serial`; the firmware stops the motors when the agent link drops |
 | Text serial protocol | host ↔ STM32 (other firmware branches) | `CMD:vx,vy,wz` → `STATE:p1,p2,p3,v1,v2,v3` at 115200 baud; spoken only by `semubot_driver` |
 | rosbridge websocket | webapp container → NUC | `ws://ROSBRIDGE_HOST:9090` |
-| Webapp HTTP | phone or tablet → NUC `:8000` | `POST /api/robot/{move,chat,mode,emergency_stop}`, `GET /api/robot/status`; no authentication |
+| Webapp HTTP | phone or tablet → NUC `:8000` | `POST /api/robot/{move,chat,mode,emergency_stop}`, `GET /api/robot/status`; `move` takes −1..1 per axis, scaled by the profile; no authentication |
 | Speech backends | brain → NUC localhost | HTTP: whisper `:8081/inference`, llama `:8082`, TTS `:8001/v2`; overridable in `~/.config/semubot/brain.env` |
 | Battery sensor | Raspberry Pi 5 (V1) | INA260 on I2C bus 1, address 0x40 |

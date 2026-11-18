@@ -18,7 +18,7 @@ machine() {
     set -a; source "$ENV_FILE"; set +a
     case "${SEMUBOT_MACHINE:-}" in
         pi) UNITS="semubot-drive" ;;
-        nuc) UNITS="semubot-rosbridge semubot-brain semubot-respeaker semubot-eyes semubot-webapp" ;;
+        nuc) UNITS="semubot-rosbridge semubot-brain semubot-respeaker semubot-eyes semubot-webapp semubot-chest-display" ;;
         *) echo "Set SEMUBOT_MACHINE=pi or nuc in $ENV_FILE."; exit 1 ;;
     esac
 }

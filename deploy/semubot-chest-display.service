@@ -1,0 +1,13 @@
+[Unit]
+Description=SemuBot chest display
+PartOf=graphical-session.target
+After=graphical-session.target
+
+[Service]
+# deploy/semubot replaces REPO with the checkout path; replaces the unit the chest display's own installer writes
+ExecStart=REPO/deploy/run.sh REPO/apps/semubot_chest_display/deploy/start.sh
+Restart=on-failure
+RestartSec=3
+
+[Install]
+WantedBy=graphical-session.target
