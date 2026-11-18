@@ -36,7 +36,7 @@ git clone --recurse-submodules https://github.com/SemuBot/semubot-software.git
 cd semubot-software
 ```
 
-With Docker (also what CI runs; the `firmware` target builds the STM32 image with the Makefile from `semubot-firmware`):
+With Docker (also what CI runs; the `firmware` target builds the STM32 image with the Makefile from `semubot-firmware`, and CI builds the webapp image from `apps/semubot_webapp` as well):
 
 ```bash
 docker build --target build -t semubot-software .

@@ -29,3 +29,8 @@ jobs:
           target: firmware
           cache-from: type=gha,scope=firmware
           cache-to: type=gha,scope=firmware,mode=max
+      - uses: docker/build-push-action@v6
+        with:
+          context: apps/semubot_webapp
+          cache-from: type=gha,scope=webapp
+          cache-to: type=gha,scope=webapp,mode=max
