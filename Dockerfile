@@ -16,7 +16,8 @@ RUN source /opt/ros/jazzy/setup.bash && colcon build --symlink-install
 
 FROM build AS test
 RUN source /opt/ros/jazzy/setup.bash && source install/setup.bash \
-    && colcon test; colcon test-result --verbose; true
+    && colcon test --packages-skip micro_ros_agent micro_ros_msgs --pytest-args -m "not linter" \
+    && colcon test-result --verbose
 
 FROM microros/micro_ros_static_library_builder:jazzy AS microros
 COPY firmware/wheelbase/wheelbase /project

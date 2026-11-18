@@ -18,7 +18,6 @@ jobs:
           cache-from: type=gha,scope=build
           cache-to: type=gha,scope=build,mode=max
       - uses: docker/build-push-action@v6
-        continue-on-error: true
         with:
           context: .
           target: test

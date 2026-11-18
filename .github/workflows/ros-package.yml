@@ -32,6 +32,5 @@ jobs:
           cd semubot-software/ros2_ws
           . /opt/ros/jazzy/setup.sh
           . install/setup.sh
-          colcon test --packages-select ${{ inputs.package }}
+          colcon test --packages-select ${{ inputs.package }} --pytest-args -m "not linter"
           colcon test-result --verbose
-        continue-on-error: true

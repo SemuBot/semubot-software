@@ -52,6 +52,13 @@ rosdep install --from-paths src --ignore-src -r -y
 colcon build --symlink-install
 ```
 
+Tests, as CI runs them (the lint checks are left out; run `colcon test` without the last argument to include them):
+
+```bash
+colcon test --packages-skip micro_ros_agent micro_ros_msgs --pytest-args -m "not linter"
+colcon test-result --verbose
+```
+
 VS Code with the Dev Containers extension opens the same image through `.devcontainer/`.
 
 On a robot computer (Ubuntu 24.04, ROS 2 Jazzy, user `semubot`), after the clone. The first run creates `~/.config/semubot/semubot.env`; set `SEMUBOT_MACHINE` there to `pi` (drive stack) or `nuc` (speech, face, webapp, chest display) and run again:
