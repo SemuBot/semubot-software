@@ -11,7 +11,6 @@ semubot-software/
 │   ├── semubot_raspberry_bringup   GPIO motor driver, e-stop, joystick, battery monitor, systemd         [V1: Raspberry Pi 5, legacy]
 │   ├── semubot_description         URDF/xacro model (V1 + V2 wheelbase), meshes                          [any]
 │   ├── semubot_arm_description     arm + hand xacro macro, included by semubot_description               [any]
-│   ├── semubot_config              parameter profiles, one per robot revision (v1, v2)                   [any]
 │   ├── semubot_gazebo              Gazebo worlds and launch                                              [dev PC]
 │   ├── semubot_brain               speech: VAD, ASR, LLM (local or cloud), Estonian TTS                  [NUC]
 │   ├── semubot_eyes                animated face driven by the brain's state                             [NUC]
@@ -70,7 +69,7 @@ deploy/semubot update [REF]       # switch to a commit or tag (default origin/ma
 deploy/semubot rollback           # back to the commit the last update replaced
 ```
 
-Units are `semubot-drive` on the Pi; `semubot-rosbridge`, `semubot-brain`, `semubot-respeaker`, `semubot-eyes`, `semubot-webapp` and `semubot-chest-display` on the NUC. Every unit runs through `deploy/run.sh`, which loads the env file and points the apps at the profile from `semubot_config`. The speech backends (whisper, llama, TTS) are not part of this workspace yet.
+Units are `semubot-drive` on the Pi; `semubot-rosbridge`, `semubot-brain`, `semubot-respeaker`, `semubot-eyes`, `semubot-webapp` and `semubot-chest-display` on the NUC. Every unit runs through `deploy/run.sh`, which loads the env file and points the apps at the robot profile in `semubot_bringup`. The speech backends (whisper, llama, TTS) are not part of this workspace yet.
 
 Move a pin after a component repo changed:
 

@@ -5,5 +5,5 @@ source /opt/ros/jazzy/setup.bash
 source "$REPO/ros2_ws/install/setup.bash"
 [ -f "$HOME/.config/semubot/semubot.env" ] && set -a && source "$HOME/.config/semubot/semubot.env" && set +a
 # The robot profile for the apps that are not ROS nodes; launch files resolve it themselves
-export SEMUBOT_PROFILE_FILE=${SEMUBOT_PROFILE_FILE:-$REPO/ros2_ws/install/semubot_config/share/semubot_config/profiles/${SEMUBOT_PROFILE:-v2}.yaml}
+export SEMUBOT_PROFILE_FILE=${SEMUBOT_PROFILE_FILE:-$REPO/ros2_ws/install/semubot_bringup/share/semubot_bringup/config/profiles/${SEMUBOT_PROFILE:-v2}.yaml}
 exec "$@"
